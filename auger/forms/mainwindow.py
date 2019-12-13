@@ -7,12 +7,14 @@ from PyQt5.QtWidgets import (
 )
 from ..app import get_app_instance
 from .resource import Resource, Resources, Ui
+from .settingsdialog import SettingsDialog
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None, flags=Qt.WindowFlags(Qt.Window)):
         super().__init__(parent, flags)
 
         self._area_to_process = tuple()
+        self._settings_dialog = None
 
         # timer for resize events
         self.resize_timer = QTimer(self)
@@ -34,6 +36,9 @@ class MainWindow(QMainWindow):
         self.actionOpen.triggered.connect(self.slot_file_open)
         self.actionSave_Output.triggered.connect(self.slot_file_save_output)
         self.actionQuit.triggered.connect(self.slot_file_quit)
+
+        # Edit Menu signals to slots
+        self.actionSettings.triggered.connect(self.slot_edit_settings)
 
         # Scene for `imageSide_Image`
         self.scene_for_image = QGraphicsScene(self.imageSide_Image)
@@ -78,6 +83,11 @@ class MainWindow(QMainWindow):
         # The HBox's height is that of without the menubar & statusbar
         self.horizontalLayoutWidget.resize(width-5,
                                            height-menu_height-status_height)
+
+        # preserve the new window size persistently
+        auger_cfg = get_app_instance().settings
+        auger_cfg.setValue('window_width', width)
+        auger_cfg.setValue('window_height', height)
 
     def slot_file_open(self):
         # prompt if an image already loaded
@@ -133,6 +143,13 @@ class MainWindow(QMainWindow):
     def slot_file_quit(self):
         self.close()
 
+    def slot_edit_settings(self):
+        if self._settings_dialog is not None:
+            self._settings_dialog = None
+
+        self._settings_dialog = SettingsDialog(self)
+        self._settings_dialog.open()
+
     def slot_zoom_in_click(self):
         if self.property('imageHasBeenLoaded') is True:
             self.imageSide_Image.scale(1.2, 1.2)
@@ -150,6 +167,16 @@ class MainWindow(QMainWindow):
             self.statusbar.showMessage('Select the region to process first...',
                                        500
                                       )
+            return
+
+        if not get_app_instance().ocr.tools:
+            QMessageBox.critical(
+                self,
+                'No suitable OCR tool found on system!',
+                'Auger was unable to find an OCR backend.\nPlease install an OCR backend such as Tesseract.',
+                QMessageBox.Ok,
+                QMessageBox.Ok
+            )
             return
 
         print("TODO: Process: {}".format(self.area_to_process))

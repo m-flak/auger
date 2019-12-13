@@ -18,7 +18,7 @@ class AugerView(QGraphicsView):
         self._select_end_coords = tuple()
 
         # the rectangle for selection
-        self.rectangle_selection = None
+        self._rectangle_selection = None
 
     def _map_select_start_coords(self):
         start_coords = self._select_start_coords
@@ -60,15 +60,15 @@ class AugerView(QGraphicsView):
 
         if auger_mw.property('imageHasBeenLoaded') is True:
             # A selection already exists when starting a new selection
-            if self.rectangle_selection is not None and self.select_toggle:
+            if self._rectangle_selection is not None and self.select_toggle:
                 rectangle = list(filter(
                     lambda i: isinstance(i, QGraphicsRectItem),
                     self.scene().items()
                 ))
                 self.scene().removeItem(*rectangle)
-                self.rectangle_selection = None
+                self._rectangle_selection = None
             # A selection already exists when ending a current selection
-            elif self.rectangle_selection is not None and not self.select_toggle:
+            elif self._rectangle_selection is not None and not self.select_toggle:
                 rectangle = list(filter(
                     lambda i: isinstance(i, QGraphicsRectItem),
                     self.scene().items()
@@ -82,19 +82,19 @@ class AugerView(QGraphicsView):
                 )
 
             # Create a new selection
-            if self.rectangle_selection is None:
+            if self._rectangle_selection is None:
                 pixmap = list(filter(
                     lambda i: isinstance(i, QGraphicsPixmapItem),
                     self.scene().items()
                 ))
-                self.rectangle_selection = QGraphicsRectItem(
+                self._rectangle_selection = QGraphicsRectItem(
                     self._select_start_coords[0],
                     self._select_start_coords[1],
                     50,
                     50,
                     *pixmap
                 )
-                self.rectangle_selection.setBrush(QBrush(Qt.green, Qt.Dense4Pattern))
-                self.rectangle_selection.setPen(QPen(QColor(Qt.darkGreen)))
+                self._rectangle_selection.setBrush(QBrush(Qt.green, Qt.Dense4Pattern))
+                self._rectangle_selection.setPen(QPen(QColor(Qt.darkGreen)))
 
         return super().mousePressEvent(mouse_event)

@@ -12,6 +12,7 @@ class Resource:
 
 class Ui:
     UiMainWindow = 1
+    UiSettingsDlg = 2
 
 class Resources:
     def __init__(self):
@@ -19,6 +20,7 @@ class Resources:
             Resource.ResourceIcon: 'auger.png',
             Resource.ResourceUi: {
                 Ui.UiMainWindow: 'mainwindow.ui',
+                Ui.UiSettingsDlg: 'settingsdialog.ui'
             },
         }
 
