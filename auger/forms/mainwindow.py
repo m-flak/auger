@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
 from ..app import get_app_instance
 from .resource import Resource, Resources, Ui
 from .settingsdialog import SettingsDialog
+from .utils import clear_body_and_insert
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None, flags=Qt.WindowFlags(Qt.Window)):
@@ -53,6 +54,12 @@ class MainWindow(QMainWindow):
 
         # Process Selected button
         self.imageSide_SelectText.clicked.connect(self.slot_process_selected_click)
+
+        # Text Edit Changed
+        self.textSide_textEdit.textChanged.connect(self.slot_textedit_changed)
+
+        # Connect OCR perform signal
+        get_app_instance().ocr.sig_performed.connect(self.slot_ocr_performed)
 
     @property
     def window_size(self):
@@ -138,7 +145,20 @@ class MainWindow(QMainWindow):
         self.setProperty('imageHasBeenLoaded', QVariant(True))
 
     def slot_file_save_output(self):
-        print("Save Output Text...")
+        open_from_here = QDir.toNativeSeparators(QDir.homePath())
+        output_file, output_extension = QFileDialog.getSaveFileName(
+            self,
+            'Save Output Text...',
+            open_from_here,
+            'Text Files (*.txt);;HTML Files (*.html *.htm)'
+        )
+
+        if 'txt' in output_extension:
+            with open(output_file, 'w') as f:
+                f.write(self.textSide_textEdit.toPlainText())
+        elif 'htm' in output_extension:
+            with open(output_file, 'w') as f:
+                f.write(self.textSide_textEdit.toHtml())
 
     def slot_file_quit(self):
         self.close()
@@ -149,6 +169,20 @@ class MainWindow(QMainWindow):
 
         self._settings_dialog = SettingsDialog(self)
         self._settings_dialog.open()
+
+    def slot_select_start(self, start):
+        x, y = start
+        self.statusbar.showMessage('Selection Started: ({}, {})'.format(x, y))
+
+    def slot_select_end(self, start, end):
+        x1, y1 = start
+        x2, y2 = end
+
+        self.statusbar.showMessage('Selection Ended: ({}, {})'.\
+                                   format(x2, y2),
+                                   500
+                                  )
+        self.area_to_process = (x1, y1, x2-x1, y2-y1)
 
     def slot_zoom_in_click(self):
         if self.property('imageHasBeenLoaded') is True:
@@ -179,18 +213,25 @@ class MainWindow(QMainWindow):
             )
             return
 
-        print("TODO: Process: {}".format(self.area_to_process))
+        # Perform OCR :)
+        get_app_instance().ocr.perform_ocr(
+            self.pixmap_of_image.toImage().copy(*self.area_to_process)
+        )
 
-    def slot_select_start(self, start):
-        x, y = start
-        self.statusbar.showMessage('Selection Started: ({}, {})'.format(x, y))
+    def slot_textedit_changed(self):
+        self.actionSave_Output.setEnabled(True)
 
-    def slot_select_end(self, start, end):
-        x1, y1 = start
-        x2, y2 = end
+    def slot_ocr_performed(self, ocr_text):
+        # empty string has resulted :(
+        if not ocr_text:
+            self.statusbar.showMessage('Unable to recognize text. Try again.', 500)
+            return
 
-        self.statusbar.showMessage('Selection Ended: ({}, {})'.\
-                                   format(x2, y2),
-                                   500
-                                  )
-        self.area_to_process = (x1, y1, x2-x1, y2-y1)
+        new_contents = clear_body_and_insert(
+            self.textSide_textEdit.toHtml(),
+            ocr_text,
+            'p'
+        )
+        self.textSide_textEdit.setHtml(new_contents)
+
+        self.statusbar.showMessage('Text recognized. OCR successful.', 500)

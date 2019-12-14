@@ -65,7 +65,10 @@ class AugerView(QGraphicsView):
                     lambda i: isinstance(i, QGraphicsRectItem),
                     self.scene().items()
                 ))
-                self.scene().removeItem(*rectangle)
+                try:
+                    self.scene().removeItem(*rectangle)
+                except TypeError:
+                    self._rectangle_selection = None
                 self._rectangle_selection = None
             # A selection already exists when ending a current selection
             elif self._rectangle_selection is not None and not self.select_toggle:
