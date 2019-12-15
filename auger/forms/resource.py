@@ -9,6 +9,10 @@ __all__ = (
 class Resource:
     ResourceIcon = 1
     ResourceUi = 2
+    ResourceToolIcon = 3
+
+class ToolIcon:
+    ToolIconFontSize = 1
 
 class Ui:
     UiMainWindow = 1
@@ -20,7 +24,10 @@ class Resources:
             Resource.ResourceIcon: 'auger.png',
             Resource.ResourceUi: {
                 Ui.UiMainWindow: 'mainwindow.ui',
-                Ui.UiSettingsDlg: 'settingsdialog.ui'
+                Ui.UiSettingsDlg: 'settingsdialog.ui',
+            },
+            Resource.ResourceToolIcon: {
+                ToolIcon.ToolIconFontSize: 'tool_fontsize.png',
             },
         }
 
@@ -30,18 +37,29 @@ class Resources:
         self._ui_directory = 'ui'
 
     def resource(self, what_resource, **kwargs):
-        if what_resource == Resource.ResourceUi:
-            which = kwargs.get('which', None)
+        which = kwargs.get('which', None)
+
+        if what_resource in (Resource.ResourceUi, Resource.ResourceToolIcon):
             if which is None:
-                raise ValueError('Resource.ResourceUi requires kwarg: which.')
+                raise ValueError('{} requires kwarg: which.'.format(what_resource))
+
+        if what_resource == Resource.ResourceUi:
             return os.path.join(
                 self._cwd,
                 self._ui_directory,
                 self._resources[what_resource][which]
             )
 
-        return os.path.join(
-            self._cwd,
-            self._res_directory,
-            self._resources[what_resource]
-        )
+        # If the `which` parameter is needed, then do it
+        try:
+            return os.path.join(
+                self._cwd,
+                self._res_directory,
+                self._resources[what_resource]
+            )
+        except TypeError:
+            return os.path.join(
+                self._cwd,
+                self._res_directory,
+                self._resources[what_resource][which]
+            )

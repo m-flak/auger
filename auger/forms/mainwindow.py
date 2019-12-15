@@ -220,6 +220,8 @@ class MainWindow(QMainWindow):
 
     def slot_textedit_changed(self):
         self.actionSave_Output.setEnabled(True)
+        self.textSide_textEdit.setReadOnly(False)
+        self.textSide_toolBar.setEnabled(True)
 
     def slot_ocr_performed(self, ocr_text):
         # empty string has resulted :(
