@@ -5,14 +5,23 @@ Have a screenshot but need it as a text file? Then, **_Auger_** is the tool for 
 
 ## Installation
 
-Installing **_Auger_** is easy. Just do the following:
+Installing **_Auger_** is easy...
+
+#### From Source Directory:
 ```bash
 git clone https://github.com/m-flak/auger auger
 cd auger
 pip install -r requirements.txt
+python auger.py
 ```
 
-After running the above commands or performing the equivalent of them, **just execute:** ``python auger.py``
+#### Using _setuptools_:
+```bash
+git clone https://github.com/m-flak/auger auger
+cd auger
+python setup.py build # YOU CAN USE ANY COMMAND SUPPORTED BY SETUPTOOLS
+cd build/lib; python -m auger
+```
 
 ## Requirements
 
