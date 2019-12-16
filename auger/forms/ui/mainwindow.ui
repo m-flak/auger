@@ -190,7 +190,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTextEdit" name="textSide_textEdit">
+        <widget class="AugerTextEdit" name="textSide_textEdit">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -281,6 +281,11 @@ p, li { white-space: pre-wrap; }
    <extends>QWidget</extends>
    <header>auger/forms/controls/augertoolbar.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AugerTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>auger/forms/controls/augertextedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

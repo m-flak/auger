@@ -58,6 +58,16 @@ class MainWindow(QMainWindow):
         # Text Edit Changed
         self.textSide_textEdit.textChanged.connect(self.slot_textedit_changed)
 
+        # Text Edit Font Changed / Size Changed
+        self.textSide_toolBar.sig_font_changed.connect(
+            self.textSide_textEdit.setFontFamily
+        )
+        self.textSide_toolBar.sig_font_changed.connect(self.slot_update_font_fam)
+        self.textSide_toolBar.sig_size_changed.connect(
+            self.textSide_textEdit.setFontPointSize
+        )
+        self.textSide_toolBar.sig_size_changed.connect(self.slot_update_font_sz)
+
         # Connect OCR perform signal
         get_app_instance().ocr.sig_performed.connect(self.slot_ocr_performed)
 
@@ -78,6 +88,18 @@ class MainWindow(QMainWindow):
         self.resize_timer.stop()
         self.resize_timer.start(175)
         return super().resizeEvent(resize_event)
+
+    # Override method
+    def show(self): # pylint: disable=invalid-name
+        # get font & size from before
+        auger_cfg = get_app_instance().settings
+        editor_font = auger_cfg.value('font_family', type=str)
+        editor_szfont = auger_cfg.value('font_size', type=int)
+
+        if editor_font and editor_szfont > 0:
+            self.textSide_toolBar.set_font_properties(editor_font, editor_szfont)
+
+        return super().show()
 
     ########### SLOTS ############## SLOTS ############# SLOTS ##############
 
@@ -237,3 +259,9 @@ class MainWindow(QMainWindow):
         self.textSide_textEdit.setHtml(new_contents)
 
         self.statusbar.showMessage('Text recognized. OCR successful.', 500)
+
+    def slot_update_font_fam(self, family): # pylint: disable=no-self-use
+        get_app_instance().settings.setValue('font_family', family)
+
+    def slot_update_font_sz(self, size): # pylint: disable=no-self-use
+        get_app_instance().settings.setValue('font_size', size)

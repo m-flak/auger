@@ -2,6 +2,7 @@ import os
 
 __all__ = (
     'Resource',
+    'ToolIcon',
     'Ui',
     'Resources',
 )
