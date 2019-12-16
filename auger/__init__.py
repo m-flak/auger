@@ -1,6 +1,8 @@
 from .app import AugerApplication
 from .forms.mainwindow import MainWindow
 
+__version__ = '0.0.1'
+
 def create_auger():
     app = AugerApplication([])
     window = MainWindow()
