@@ -21,7 +21,10 @@ After running the above commands or performing the equivalent of them, **just ex
 * pyocr
 * lxml
 
-## Screenshot
+## Screenshots
+
+**_December 16th, 2019:_**
+![Screenshot_12-16-2019](https://user-images.githubusercontent.com/35634280/70937998-f3c8b400-200a-11ea-896e-8f84952cb84a.png)
 
 **_December 14th, 2019:_**
 ![Screenshot_12-14-2019](https://user-images.githubusercontent.com/35634280/70853103-29d13100-1e6f-11ea-9285-4275c810d8d7.png)
