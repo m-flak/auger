@@ -1,4 +1,5 @@
 # pylint: disable=no-name-in-module
+import math
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsRectItem, QGraphicsPixmapItem
@@ -29,6 +30,16 @@ class AugerView(QGraphicsView):
         end_coords = self._select_end_coords
         qpt_ec = self.mapToScene(*end_coords).toPoint()
         self._select_end_coords = (qpt_ec.x(), qpt_ec.y())
+
+    def _calc_initial_rect_size(self):
+        # rectangle is a misnomer
+        # the selection rect will always start as a perfect square
+        tx_m11 = self.transform().m11()
+        base_size = 25
+
+        assert tx_m11 == self.transform().m22()
+
+        return math.floor(base_size/tx_m11)
 
     @property
     def select_toggle(self):
@@ -68,6 +79,7 @@ class AugerView(QGraphicsView):
                 try:
                     self.scene().removeItem(*rectangle)
                 except TypeError:
+                    # the rectangle was already removed. :/
                     self._rectangle_selection = None
                 self._rectangle_selection = None
             # A selection already exists when ending a current selection
@@ -77,12 +89,16 @@ class AugerView(QGraphicsView):
                     self.scene().items()
                 ))
                 # resize the rectangle to reflect user's selection
-                rectangle[0].setRect(
-                    self._select_start_coords[0],
-                    self._select_start_coords[1],
-                    self._select_end_coords[0]-self._select_start_coords[0],
-                    self._select_end_coords[1]-self._select_start_coords[1]
-                )
+                try:
+                    rectangle[0].setRect(
+                        self._select_start_coords[0],
+                        self._select_start_coords[1],
+                        self._select_end_coords[0]-self._select_start_coords[0],
+                        self._select_end_coords[1]-self._select_start_coords[1]
+                    )
+                except IndexError:
+                    # The rectangle doesn't exist. Ooops! Let's fix that.
+                    self._rectangle_selection = None
 
             # Create a new selection
             if self._rectangle_selection is None:
@@ -93,8 +109,8 @@ class AugerView(QGraphicsView):
                 self._rectangle_selection = QGraphicsRectItem(
                     self._select_start_coords[0],
                     self._select_start_coords[1],
-                    50,
-                    50,
+                    self._calc_initial_rect_size(),
+                    self._calc_initial_rect_size(),
                     *pixmap
                 )
                 self._rectangle_selection.setBrush(QBrush(Qt.green, Qt.Dense4Pattern))
