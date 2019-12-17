@@ -6,9 +6,9 @@ from PyQt5.QtWidgets import (
     QFileDialog, QGraphicsScene, QMainWindow, QMessageBox
 )
 from ..app import get_app_instance
+from ..utils import clear_body_and_insert
 from .resource import Resource, Resources, Ui
 from .settingsdialog import SettingsDialog
-from .utils import clear_body_and_insert
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None, flags=Qt.WindowFlags(Qt.Window)):

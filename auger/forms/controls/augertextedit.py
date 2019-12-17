@@ -85,6 +85,13 @@ class AugerTextEdit(QTextEdit):
 
         return super().setHtml(self._our_html.fresh_html)
 
+    # Override method
+    def toHtml(self): # pylint: disable=invalid-name
+        if self._our_html.html is None or self._our_html.document is None:
+            return super().toHtml()
+
+        return self._our_html.fresh_html
+
     ########### SLOTS ############## SLOTS ############# SLOTS ##############
 
     def slot_set_fontfamily(self, family):
