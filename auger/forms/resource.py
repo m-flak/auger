@@ -14,6 +14,8 @@ class Resource:
 
 class ToolIcon:
     ToolIconFontSize = 1
+    ToolIconZoomIn = 2
+    ToolIconZoomOut = 3
 
 class Ui:
     UiMainWindow = 1
@@ -29,6 +31,8 @@ class Resources:
             },
             Resource.ResourceToolIcon: {
                 ToolIcon.ToolIconFontSize: 'tool_fontsize.png',
+                ToolIcon.ToolIconZoomIn: 'tool_zoomin.png',
+                ToolIcon.ToolIconZoomOut: 'tool_zoomout.png',
             },
         }
 

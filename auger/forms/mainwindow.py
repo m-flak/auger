@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
 )
 from ..app import get_app_instance
 from ..utils import clear_body_and_insert
-from .resource import Resource, Resources, Ui
+from .resource import Resource, Resources, Ui, ToolIcon
 from .settingsdialog import SettingsDialog
 
 class MainWindow(QMainWindow):
@@ -32,6 +32,14 @@ class MainWindow(QMainWindow):
 
         # Set Icon
         self.setWindowIcon(QIcon(Resources().resource(Resource.ResourceIcon)))
+
+        # Set Icons for the zoom buttons
+        self.imageSide_ZoomIn.setIcon(
+            QIcon(Resources().resource(Resource.ResourceToolIcon, which=ToolIcon.ToolIconZoomIn)),
+        )
+        self.imageSide_ZoomOut.setIcon(
+            QIcon(Resources().resource(Resource.ResourceToolIcon, which=ToolIcon.ToolIconZoomOut)),
+        )
 
         # File Menu signals to slots
         self.actionOpen.triggered.connect(self.slot_file_open)
