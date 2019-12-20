@@ -3,7 +3,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import Qt, QDir, QTimer, QVariant
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import (
-    QFileDialog, QGraphicsScene, QMainWindow, QMessageBox
+    QFileDialog, QGraphicsScene, QMainWindow, QMessageBox, QAction
 )
 from ..app import get_app_instance
 from ..utils import clear_body_and_insert
@@ -35,10 +35,15 @@ class MainWindow(QMainWindow):
 
         # Set Icons for the zoom buttons
         self.imageSide_ZoomIn.setIcon(
-            QIcon(Resources().resource(Resource.ResourceToolIcon, which=ToolIcon.ToolIconZoomIn)),
+            QIcon(Resources().resource(Resource.ResourceToolIcon, which=ToolIcon.ToolIconZoomIn))
         )
         self.imageSide_ZoomOut.setIcon(
-            QIcon(Resources().resource(Resource.ResourceToolIcon, which=ToolIcon.ToolIconZoomOut)),
+            QIcon(Resources().resource(Resource.ResourceToolIcon, which=ToolIcon.ToolIconZoomOut))
+        )
+
+        # Set Icons for select languages button
+        self.imageSide_UseLanguage.setIcon(
+            QIcon(Resources().resource(Resource.ResourceToolIcon, which=ToolIcon.ToolIconLanguages))
         )
 
         # File Menu signals to slots
@@ -78,6 +83,9 @@ class MainWindow(QMainWindow):
 
         # Connect OCR perform signal
         get_app_instance().ocr.sig_performed.connect(self.slot_ocr_performed)
+
+        # Connect OCR use language change signal
+        get_app_instance().ocr.sig_change_lang.connect(self.slot_ocr_change_lang)
 
     @property
     def window_size(self):
@@ -273,3 +281,6 @@ class MainWindow(QMainWindow):
 
     def slot_update_font_sz(self, size): # pylint: disable=no-self-use
         get_app_instance().settings.setValue('font_size', size)
+
+    def slot_ocr_change_lang(self, lang):
+        self.statusbar.showMessage('OCR Language changed to: {}.'.format(lang))

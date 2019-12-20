@@ -2,3 +2,4 @@ PyQt5
 Pillow
 pyocr
 lxml
+iso-language-codes

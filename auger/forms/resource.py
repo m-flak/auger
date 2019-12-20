@@ -16,6 +16,7 @@ class ToolIcon:
     ToolIconFontSize = 1
     ToolIconZoomIn = 2
     ToolIconZoomOut = 3
+    ToolIconLanguages = 4
 
 class Ui:
     UiMainWindow = 1
@@ -33,6 +34,7 @@ class Resources:
                 ToolIcon.ToolIconFontSize: 'tool_fontsize.png',
                 ToolIcon.ToolIconZoomIn: 'tool_zoomin.png',
                 ToolIcon.ToolIconZoomOut: 'tool_zoomout.png',
+                ToolIcon.ToolIconLanguages: 'tool_languages.png',
             },
         }
 
