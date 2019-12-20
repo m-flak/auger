@@ -29,6 +29,7 @@ cd build/lib; python -m auger
 * Pillow
 * pyocr
 * lxml
+* iso-language-codes
 
 ## Screenshots
 
