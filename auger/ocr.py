@@ -31,6 +31,7 @@ class ImageAdapter:
 class AugerOCR(QObject):
     sig_performed = pyqtSignal(str)
     sig_change_lang = pyqtSignal(str)
+    sig_ocr_error = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -158,21 +159,26 @@ class AugerOCR(QObject):
     def perform_ocr(self, qt_image):
         image = ImageAdapter(qt_image)
 
-        # Attempt OCR with 'Use' language
-        text = self.tool.image_to_string(
-            image(),
-            lang=self.use_language,
-            builder=pyocr.builders.TextBuilder()
-        )
-
-        # Use the default / fallback language if the above operation yielded
-        # no results
-        if not text:
+        try:
+            # Attempt OCR with 'Use' language
             text = self.tool.image_to_string(
                 image(),
-                lang=self.default_language,
+                lang=self.use_language,
                 builder=pyocr.builders.TextBuilder()
                 )
+
+                # Use the default / fallback language if the above operation yielded
+                # no results
+            if not text:
+                text = self.tool.image_to_string(
+                    image(),
+                    lang=self.default_language,
+                    builder=pyocr.builders.TextBuilder()
+                )
+
+        except Exception as e:
+            self.sig_ocr_error.emit(str(e))
+            return
 
         self.sig_performed.emit(text)
 

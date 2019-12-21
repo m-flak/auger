@@ -3,7 +3,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import Qt, QDir, QTimer, QVariant
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import (
-    QFileDialog, QGraphicsScene, QMainWindow, QMessageBox, QAction
+    QFileDialog, QGraphicsScene, QMainWindow, QMessageBox
 )
 from ..app import get_app_instance
 from ..utils import clear_body_and_insert
@@ -86,6 +86,9 @@ class MainWindow(QMainWindow):
 
         # Connect OCR use language change signal
         get_app_instance().ocr.sig_change_lang.connect(self.slot_ocr_change_lang)
+
+        # Connect OCR error handler
+        get_app_instance().ocr.sig_ocr_error.connect(self.slot_ocr_error_handle)
 
     @property
     def window_size(self):
@@ -283,4 +286,13 @@ class MainWindow(QMainWindow):
         get_app_instance().settings.setValue('font_size', size)
 
     def slot_ocr_change_lang(self, lang):
-        self.statusbar.showMessage('OCR Language changed to: {}.'.format(lang))
+        self.statusbar.showMessage('OCR Language changed to: {}.'.format(lang), 500)
+
+    def slot_ocr_error_handle(self, error):
+        QMessageBox.critical(
+            self,
+            'OCR Error Occurred!',
+            'An error was encountered when attempting to perform OCR:\n\n{}'.format(error),
+            QMessageBox.Ok,
+            QMessageBox.Ok
+        )
