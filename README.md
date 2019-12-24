@@ -3,6 +3,12 @@
 
 Have a screenshot but need it as a text file? Then, **_Auger_** is the tool for you!
 
+You can select multiple regions of text within an image and format the results yourself.
+
+Auger supports output into the following formats:
+- Plain Text
+- HTML
+
 ## Installation
 
 Installing **_Auger_** is easy...
@@ -32,6 +38,9 @@ cd build/lib; python -m auger
 * iso-language-codes
 
 ## Screenshots
+
+**_December 24th, 2019:_**
+![Screenshot_12-24-2019](https://user-images.githubusercontent.com/35634280/71423369-9fe34e00-264e-11ea-9fe3-b1dc6ea0e562.png)
 
 **_December 16th, 2019:_**
 ![Screenshot_12-16-2019](https://user-images.githubusercontent.com/35634280/70937998-f3c8b400-200a-11ea-896e-8f84952cb84a.png)
