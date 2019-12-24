@@ -4,6 +4,9 @@ from PyQt5.QtGui import QContextMenuEvent, QActionEvent
 from PyQt5.QtWidgets import QPushButton, QAction
 from ...app import get_app_instance
 
+# Wow, so I pretty much reimplemented the QToolButton here.
+# Amazing how there's so many ways to do things with QT.
+
 class LanguageAction(QAction):
     sig_change_lang = pyqtSignal(str)
 
@@ -42,6 +45,20 @@ class AugerLanguageButton(QPushButton):
         super().__init__(*args, **kwargs)
 
         self.addActions(list(make_actions(get_app_instance().ocr.languages)))
+
+    def mark_active_language(self, language):
+        """Mark the active language with a bullet point
+        """
+        our_actions = zip(
+            self.actions(),
+            [a.data() for a in self.actions()]
+        )
+
+        for action, data in our_actions:
+            if language in data:
+                if u'\u2022' not in action.text():
+                    action.setText(u'\u2022 {}'.format(action.text()))
+                break
 
     # Override method
     def mousePressEvent(self, mouse_event): # pylint: disable=invalid-name

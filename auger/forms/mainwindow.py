@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
     QFileDialog, QGraphicsScene, QMainWindow, QMessageBox
 )
 from ..app import get_app_instance
-from ..utils import clear_body_and_insert
+from ..utils import clear_body_and_insert, append_to_body
 from .resource import Resource, Resources, Ui, ToolIcon
 from .settingsdialog import SettingsDialog
 
@@ -16,6 +16,7 @@ class MainWindow(QMainWindow):
 
         self._area_to_process = tuple()
         self._settings_dialog = None
+        self._append_text = False
 
         # timer for resize events
         self.resize_timer = QTimer(self)
@@ -81,6 +82,9 @@ class MainWindow(QMainWindow):
         )
         self.textSide_toolBar.sig_size_changed.connect(self.slot_update_font_sz)
 
+        # Text Edit toggle append or overwrite
+        self.textSide_toolBar.sig_ao_toggle.connect(self.slot_toggle_append)
+
         # Connect OCR perform signal
         get_app_instance().ocr.sig_performed.connect(self.slot_ocr_performed)
 
@@ -102,6 +106,14 @@ class MainWindow(QMainWindow):
     def area_to_process(self, value):
         self._area_to_process = tuple(value)
 
+    @property
+    def append_text(self):
+        return self._append_text
+
+    @append_text.setter
+    def append_text(self, value):
+        self._append_text = bool(value)
+
     # Override method
     def resizeEvent(self, resize_event): # pylint: disable=invalid-name
         self.resize_timer.stop()
@@ -114,9 +126,16 @@ class MainWindow(QMainWindow):
         auger_cfg = get_app_instance().settings
         editor_font = auger_cfg.value('font_family', type=str)
         editor_szfont = auger_cfg.value('font_size', type=int)
+        # get the 'use' & 'default' language from before
+        use_lang = auger_cfg.value('use_language', type=str)
+        def_lang = auger_cfg.value('default_language', type=str)
 
         if editor_font and editor_szfont > 0:
             self.textSide_toolBar.set_font_properties(editor_font, editor_szfont)
+
+        if use_lang or def_lang:
+            lang = use_lang if use_lang else def_lang
+            self.imageSide_UseLanguage.mark_active_language(lang)
 
         return super().show()
 
@@ -141,8 +160,8 @@ class MainWindow(QMainWindow):
         # prompt if an image already loaded
         if self.property('imageHasBeenLoaded') is True:
             discard_quest = QMessageBox.\
-                            question(self, 'Discard Current Environment?',
-                                     'Do you wish to discard any & all changes?',
+                            question(self, 'Discard Current Image?',
+                                     'Do you wish to discard the current image?',
                                      QMessageBox.Yes | QMessageBox.No,
                                      QMessageBox.No)
 
@@ -270,11 +289,19 @@ class MainWindow(QMainWindow):
             self.statusbar.showMessage('Unable to recognize text. Try again.', 500)
             return
 
-        new_contents = clear_body_and_insert(
-            self.textSide_textEdit.toHtml(),
-            ocr_text,
-            'p'
-        )
+        if not self.append_text:
+            new_contents = clear_body_and_insert(
+                self.textSide_textEdit.toHtml(),
+                ocr_text,
+                'p'
+            )
+        else:
+            new_contents = append_to_body(
+                self.textSide_textEdit.toHtml(),
+                ocr_text,
+                'p'
+            )
+        
         self.textSide_textEdit.setHtml(new_contents)
 
         self.statusbar.showMessage('Text recognized. OCR successful.', 500)
@@ -296,3 +323,6 @@ class MainWindow(QMainWindow):
             QMessageBox.Ok,
             QMessageBox.Ok
         )
+
+    def slot_toggle_append(self, yes_or_no):
+        self.append_text = yes_or_no

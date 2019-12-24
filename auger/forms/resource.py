@@ -17,6 +17,8 @@ class ToolIcon:
     ToolIconZoomIn = 2
     ToolIconZoomOut = 3
     ToolIconLanguages = 4
+    ToolIconAppendOn = 5
+    ToolIconAppendOff = 6
 
 class Ui:
     UiMainWindow = 1
@@ -35,6 +37,8 @@ class Resources:
                 ToolIcon.ToolIconZoomIn: 'tool_zoomin.png',
                 ToolIcon.ToolIconZoomOut: 'tool_zoomout.png',
                 ToolIcon.ToolIconLanguages: 'tool_languages.png',
+                ToolIcon.ToolIconAppendOn: 'tool_append_on.png',
+                ToolIcon.ToolIconAppendOff: 'tool_append_off.png',
             },
         }
 

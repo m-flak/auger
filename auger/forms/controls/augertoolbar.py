@@ -5,15 +5,18 @@ from PyQt5.QtWidgets import (
     QWidget, QHBoxLayout, QFontComboBox, QLabel, QLineEdit
 )
 from ..resource import Resource, Resources, ToolIcon
+from .augerapptoggler import AugerAppendToggler
 
 class AugerToolbar(QWidget):
     sig_font_changed = pyqtSignal(str)
     sig_size_changed = pyqtSignal(int)
+    sig_ao_toggle = pyqtSignal(bool)
 
     def __init__(self, parent, flags=Qt.WindowFlags(Qt.Widget)):
         super().__init__(parent, flags)
 
         font_size_tooltip = 'Font Size (in pt.)'
+        ao_tooltip = 'Append / Overwrite (Default: Overwrite)'
 
         # Font Selector
         self._fontbox = QFontComboBox(self)
@@ -39,11 +42,18 @@ class AugerToolbar(QWidget):
         self._fontsize.setToolTip(font_size_tooltip)
         self._fontsize.textChanged.connect(self.slot_size_changed)
 
+        # The Append / Overwrite Toggler
+        self._appendtoggler = AugerAppendToggler(self)
+        self._appendtoggler.setFixedSize(25, 25)
+        self._appendtoggler.setToolTip(ao_tooltip)
+        self._appendtoggler.clicked.connect(self.slot_append_toggle)
+
         # The Layout holding all toolbar contents
         self._layout = QHBoxLayout(self)
         self._layout.addWidget(self._fontbox)
         self._layout.addWidget(self._label_size)
         self._layout.addWidget(self._fontsize)
+        self._layout.addWidget(self._appendtoggler)
 
         self.setLayout(self._layout)
 
@@ -84,3 +94,6 @@ class AugerToolbar(QWidget):
 
         if font_size > 0:
             self.sig_size_changed.emit(font_size)
+
+    def slot_append_toggle(self, state):
+        self.sig_ao_toggle.emit(state)
