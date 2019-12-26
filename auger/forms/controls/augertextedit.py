@@ -92,6 +92,18 @@ class AugerTextEdit(QTextEdit):
 
         return self._our_html.fresh_html
 
+    def transfer_text_to_other_html(self, other):
+        if not isinstance(other, AugerTextEdit):
+            raise TypeError
+
+        other.setHtml(self.toPlainText())
+
+    def transfer_html_to_other_text(self, other):
+        if not isinstance(other, AugerTextEdit):
+            raise TypeError
+
+        other.setPlainText(self.toHtml())
+
     ########### SLOTS ############## SLOTS ############# SLOTS ##############
 
     def slot_set_fontfamily(self, family):
@@ -105,5 +117,8 @@ class AugerTextEdit(QTextEdit):
         self.sig_style_changed.emit((self._font_family, size))
 
     def slot_style_changed(self, styles):
+        if self._our_html.html is None or self._our_html.document is None:
+            return
+        
         self._our_html.apply_body_style(BodyStyle(*styles))
         self.setHtml(self._our_html.fresh_html)

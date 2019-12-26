@@ -69,6 +69,9 @@ class MainWindow(QMainWindow):
         # Process Selected button
         self.imageSide_SelectText.clicked.connect(self.slot_process_selected_click)
 
+        # Text Tabs Clicked
+        self.textSide_tabView.tabBarClicked.connect(self.slot_tab_clicked)
+
         # Text Edit Changed
         self.textSide_textEdit.textChanged.connect(self.slot_textedit_changed)
 
@@ -84,6 +87,14 @@ class MainWindow(QMainWindow):
 
         # Text Edit toggle append or overwrite
         self.textSide_toolBar.sig_ao_toggle.connect(self.slot_toggle_append)
+
+        # HTML Edit Font Changed / Size Changed
+        self.textSide_toolBar.sig_font_changed.connect(
+            self.textSide_htmlEdit.setFontFamily
+        )
+        self.textSide_toolBar.sig_size_changed.connect(
+            self.textSide_htmlEdit.setFontPointSize
+        )
 
         # Connect OCR perform signal
         get_app_instance().ocr.sig_performed.connect(self.slot_ocr_performed)
@@ -150,6 +161,19 @@ class MainWindow(QMainWindow):
         # The HBox's height is that of without the menubar & statusbar
         self.horizontalLayoutWidget.resize(width-5,
                                            height-menu_height-status_height)
+
+        # resize the text edits to tab size
+        edit_tabs = [
+            self.textSide_textEdit.parent(),
+            self.textSide_htmlEdit.parent()
+        ]
+        # the 2nd tab is not the same size as the 1st tab. why??
+        for index, tab in enumerate(edit_tabs):
+            if tab is self.textSide_tabView.currentWidget():
+                other = index ^ 1
+                tab.children()[0].resize(tab.size())
+                edit_tabs[other].children()[0].resize(tab.size())
+                break
 
         # preserve the new window size persistently
         auger_cfg = get_app_instance().settings
@@ -278,6 +302,25 @@ class MainWindow(QMainWindow):
             self.pixmap_of_image.toImage().copy(*self.area_to_process)
         )
 
+    def slot_tab_clicked(self, index):
+        if index > -1 and index != self.textSide_tabView.currentIndex():
+            # clicking 'Text' from 'HTML'
+            if index == 0:
+                try:
+                    self.textSide_htmlEdit.transfer_text_to_other_html(
+                        self.textSide_textEdit
+                    )
+                except TypeError:
+                    return
+            # clicking 'HTML' from 'Text'
+            elif index == 1:
+                try:
+                    self.textSide_textEdit.transfer_html_to_other_text(
+                        self.textSide_htmlEdit
+                    )
+                except TypeError:
+                    return
+
     def slot_textedit_changed(self):
         self.actionSave_Output.setEnabled(True)
         self.textSide_textEdit.setReadOnly(False)
@@ -301,7 +344,7 @@ class MainWindow(QMainWindow):
                 ocr_text,
                 'p'
             )
-        
+
         self.textSide_textEdit.setHtml(new_contents)
 
         self.statusbar.showMessage('Text recognized. OCR successful.', 500)
