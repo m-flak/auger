@@ -5,6 +5,25 @@ Have a screenshot but need it as a text file? Then, **_Auger_** is the tool for 
 
 You can select multiple regions of text within an image and format the results yourself.
 
+* [Features](#features)
+* [Installation](#installation)
+* [Requirements](#requirements)
+* [Screenshots](#screenshots)
+
+## Features
+
+#### Formatting
+Auger offers you two ways of formatting your output within the program:
+- HTML, with both a WYSIWYG and raw code view
+- Text, with font and font size customizable
+
+#### Images
+Any image format compatible with the Qt library is compatible with Auger.
+
+#### Languages
+Languages supported by your OCR backend _(e.g.: Tesseract)_ are supported by Auger. Pick the language, select part of the image, and boom! It's that simple.
+
+#### Output
 Auger supports output into the following formats:
 - Plain Text
 - HTML
