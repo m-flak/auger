@@ -23,6 +23,7 @@ class ToolIcon:
 class Ui:
     UiMainWindow = 1
     UiSettingsDlg = 2
+    UiAboutDlg = 3
 
 class Resources:
     def __init__(self):
@@ -31,6 +32,7 @@ class Resources:
             Resource.ResourceUi: {
                 Ui.UiMainWindow: 'mainwindow.ui',
                 Ui.UiSettingsDlg: 'settingsdialog.ui',
+                Ui.UiAboutDlg: 'aboutdialog.ui',
             },
             Resource.ResourceToolIcon: {
                 ToolIcon.ToolIconFontSize: 'tool_fontsize.png',

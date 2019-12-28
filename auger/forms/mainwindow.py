@@ -9,6 +9,7 @@ from ..app import get_app_instance
 from ..utils import clear_body_and_insert, append_to_body
 from .resource import Resource, Resources, Ui, ToolIcon
 from .settingsdialog import SettingsDialog
+from .aboutdialog import AboutDialog
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None, flags=Qt.WindowFlags(Qt.Window)):
@@ -16,6 +17,7 @@ class MainWindow(QMainWindow):
 
         self._area_to_process = tuple()
         self._settings_dialog = None
+        self._about_dialog = None
         self._append_text = False
 
         # timer for resize events
@@ -54,6 +56,9 @@ class MainWindow(QMainWindow):
 
         # Edit Menu signals to slots
         self.actionSettings.triggered.connect(self.slot_edit_settings)
+
+        # Help Menu signals to slots
+        self.actionAbout_Auger.triggered.connect(self.slot_help_about)
 
         # Scene for `imageSide_Image`
         self.scene_for_image = QGraphicsScene(self.imageSide_Image)
@@ -108,6 +113,10 @@ class MainWindow(QMainWindow):
     @property
     def window_size(self):
         return (self.size().width(), self.size().height())
+
+    @property
+    def current_tab(self):
+        return self.textSide_tabView.currentWidget()
 
     @property
     def area_to_process(self):
@@ -169,7 +178,7 @@ class MainWindow(QMainWindow):
         ]
         # the 2nd tab is not the same size as the 1st tab. why??
         for index, tab in enumerate(edit_tabs):
-            if tab is self.textSide_tabView.currentWidget():
+            if tab is self.current_tab:
                 other = index ^ 1
                 tab.children()[0].resize(tab.size())
                 edit_tabs[other].children()[0].resize(tab.size())
@@ -254,6 +263,13 @@ class MainWindow(QMainWindow):
         self._settings_dialog = SettingsDialog(self)
         self._settings_dialog.open()
 
+    def slot_help_about(self):
+        if self._about_dialog is not None:
+            self._about_dialog = None
+
+        self._about_dialog = AboutDialog(self)
+        self._about_dialog.open()
+
     def slot_select_start(self, start):
         x, y = start
         self.statusbar.showMessage('Selection Started: ({}, {})'.format(x, y))
@@ -332,20 +348,36 @@ class MainWindow(QMainWindow):
             self.statusbar.showMessage('Unable to recognize text. Try again.', 500)
             return
 
-        if not self.append_text:
-            new_contents = clear_body_and_insert(
-                self.textSide_textEdit.toHtml(),
-                ocr_text,
-                'p'
-            )
+        if self.current_tab is self.tabTextEdit:
+            if not self.append_text:
+                new_contents = clear_body_and_insert(
+                    self.textSide_textEdit.toHtml(),
+                    ocr_text,
+                    'p'
+                )
+            else:
+                new_contents = append_to_body(
+                    self.textSide_textEdit.toHtml(),
+                    ocr_text,
+                    'p'
+                )
+            # Update Rich Text's underlying html code
+            self.textSide_textEdit.setHtml(new_contents)
         else:
-            new_contents = append_to_body(
-                self.textSide_textEdit.toHtml(),
-                ocr_text,
-                'p'
-            )
-
-        self.textSide_textEdit.setHtml(new_contents)
+            if not self.append_text:
+                new_contents = clear_body_and_insert(
+                    self.textSide_htmlEdit.toPlainText(),
+                    ocr_text,
+                    'p'
+                )
+            else:
+                new_contents = append_to_body(
+                    self.textSide_htmlEdit.toPlainText(),
+                    ocr_text,
+                    'p'
+                )
+            # Update the HTML view's code. It is plain text in respect
+            self.textSide_htmlEdit.setPlainText(new_contents)
 
         self.statusbar.showMessage('Text recognized. OCR successful.', 500)
 
