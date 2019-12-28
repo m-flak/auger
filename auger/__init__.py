@@ -13,6 +13,13 @@ def create_auger():
     if win_w > 0 and win_h > 0:
         window.resize(win_w, win_h)
 
+    # Maximize the window if it was before. >:(
+    was_maximized = app.settings.value('was_maximized', type=bool)
+    if was_maximized:
+        window.setWindowState(
+            window.windowState() | 0x00000002 # Qt::WindowMaximized
+        )
+
     # Pick the ocr tool from settings (if possible)
     chosen_tool = app.settings.value('chosen_tool', type=str)
     if chosen_tool:

@@ -3,8 +3,8 @@ from PyQt5 import uic
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QDialog
-from .resource import Resource, Resources, Ui
 import auger
+from .resource import Resource, Resources, Ui
 
 class AboutDialog(QDialog):
     def __init__(self, parent=None, flags=Qt.WindowFlags(Qt.Dialog)):

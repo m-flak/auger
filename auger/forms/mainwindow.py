@@ -135,6 +135,17 @@ class MainWindow(QMainWindow):
         self._append_text = bool(value)
 
     # Override method
+    def closeEvent(self, close_event): # pylint: disable=invalid-name
+        was_maximized = False
+
+        if self.isMaximized() or self.windowState() & Qt.WindowMaximized == Qt.WindowMaximized:
+            was_maximized = True
+
+        get_app_instance().settings.setValue('was_maximized', was_maximized)
+
+        return super().closeEvent(close_event)
+
+    # Override method
     def resizeEvent(self, resize_event): # pylint: disable=invalid-name
         self.resize_timer.stop()
         self.resize_timer.start(175)
