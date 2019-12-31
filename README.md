@@ -58,6 +58,9 @@ cd build/lib; python -m auger
 
 ## Screenshots
 
+**_Decemeber 31st, 2019:_**
+![Screenshot_12-31-2019](https://user-images.githubusercontent.com/35634280/71628614-61a1dd80-2bbe-11ea-8f42-67be835fd0b0.png)
+
 **_December 24th, 2019:_**
 ![Screenshot_12-24-2019](https://user-images.githubusercontent.com/35634280/71423369-9fe34e00-264e-11ea-9fe3-b1dc6ea0e562.png)
 
