@@ -1,0 +1,10 @@
+/** GLOBAL STYLESHEET FOR AUGER **/
+
+/** Toolbar buttons **/
+QPushButton[accessibleName="toolbutton"] {
+    border: none;
+}
+QPushButton[accessibleName="toolbutton"]:hover {
+    background-color: #AEE6E4;
+    border: 1px solid #76ACAA;
+}

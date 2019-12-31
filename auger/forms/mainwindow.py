@@ -6,7 +6,8 @@ from PyQt5.QtWidgets import (
     QFileDialog, QGraphicsScene, QMainWindow, QMessageBox
 )
 from ..app import get_app_instance
-from ..utils import clear_body_and_insert, append_to_body
+from ..commands import TextOverwriteCommand, TextAppendCommand
+from ..utils.html import QuickTag
 from .resource import Resource, Resources, Ui, ToolIcon
 from .settingsdialog import SettingsDialog
 from .aboutdialog import AboutDialog
@@ -115,10 +116,6 @@ class MainWindow(QMainWindow):
         return (self.size().width(), self.size().height())
 
     @property
-    def current_tab(self):
-        return self.textSide_tabView.currentWidget()
-
-    @property
     def area_to_process(self):
         return self._area_to_process
 
@@ -188,8 +185,9 @@ class MainWindow(QMainWindow):
             self.textSide_htmlEdit.parent()
         ]
         # the 2nd tab is not the same size as the 1st tab. why??
+        # this keeps both the text edits in both tabs of the same size
         for index, tab in enumerate(edit_tabs):
-            if tab is self.current_tab:
+            if tab is self.textSide_tabView.currentWidget():
                 other = index ^ 1
                 tab.children()[0].resize(tab.size())
                 edit_tabs[other].children()[0].resize(tab.size())
@@ -359,36 +357,30 @@ class MainWindow(QMainWindow):
             self.statusbar.showMessage('Unable to recognize text. Try again.', 500)
             return
 
-        if self.current_tab is self.tabTextEdit:
-            if not self.append_text:
-                new_contents = clear_body_and_insert(
-                    self.textSide_textEdit.toHtml(),
-                    ocr_text,
-                    'p'
+        if not self.append_text:
+            get_app_instance().cmd_mgr.execute_new_command(
+                TextOverwriteCommand(
+                    #currentWidget returns a pointer which python will store by
+                    #value and we don't f***ing want that...
+                    tab_ref=lambda t=self.textSide_tabView.currentWidget: t(),
+                    tabs={
+                        'text_tab': self.textSide_textEdit,
+                        'html_tab': self.textSide_htmlEdit,
+                    },
+                    data=ocr_text
                 )
-            else:
-                new_contents = append_to_body(
-                    self.textSide_textEdit.toHtml(),
-                    ocr_text,
-                    'p'
-                )
-            # Update Rich Text's underlying html code
-            self.textSide_textEdit.setHtml(new_contents)
+            )
         else:
-            if not self.append_text:
-                new_contents = clear_body_and_insert(
-                    self.textSide_htmlEdit.toPlainText(),
-                    ocr_text,
-                    'p'
+            get_app_instance().cmd_mgr.execute_new_command(
+                TextAppendCommand(
+                    tab_ref=lambda t=self.textSide_tabView.currentWidget: t(),
+                    tabs={
+                        'text_tab': self.textSide_textEdit,
+                        'html_tab': self.textSide_htmlEdit,
+                    },
+                    data=QuickTag(ocr_text, 'p')
                 )
-            else:
-                new_contents = append_to_body(
-                    self.textSide_htmlEdit.toPlainText(),
-                    ocr_text,
-                    'p'
-                )
-            # Update the HTML view's code. It is plain text in respect
-            self.textSide_htmlEdit.setPlainText(new_contents)
+            )
 
         self.statusbar.showMessage('Text recognized. OCR successful.', 500)
 

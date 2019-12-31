@@ -2,6 +2,7 @@
 from PyQt5.QtCore import QCoreApplication, QSettings
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from .ocr import AugerOCR
+from .commands import AugerCommandManager
 
 def get_app_instance():
     instance = QCoreApplication.instance()
@@ -20,6 +21,7 @@ class AugerApplication(QApplication):
         self._main_window = None
         self._ocr = None
         self._settings = None
+        self._cmd_mgr = None
 
     @property
     def main_window(self):
@@ -43,6 +45,12 @@ class AugerApplication(QApplication):
         if self._settings is None:
             self._settings = QSettings('m-flak', 'auger', self)
         return self._settings
+
+    @property
+    def cmd_mgr(self):
+        if self._cmd_mgr is None:
+            self._cmd_mgr = AugerCommandManager(self)
+        return self._cmd_mgr
 
     def __del__(self):
         # deleting a QSettings in pyqt saves the settings

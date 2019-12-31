@@ -1,9 +1,10 @@
 # pylint: disable=no-name-in-module
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QPainter, QPen, QColor, QPixmap, QFont
+from PyQt5.QtGui import QPainter, QPen, QColor, QPixmap, QFont, QIcon
 from PyQt5.QtWidgets import (
-    QWidget, QHBoxLayout, QFontComboBox, QLabel, QLineEdit
+    QWidget, QHBoxLayout, QFontComboBox, QLabel, QLineEdit, QPushButton
 )
+from ...app import get_app_instance
 from ..resource import Resource, Resources, ToolIcon
 from .augerapptoggler import AugerAppendToggler
 
@@ -48,14 +49,50 @@ class AugerToolbar(QWidget):
         self._appendtoggler.setToolTip(ao_tooltip)
         self._appendtoggler.clicked.connect(self.slot_append_toggle)
 
+        # The Undo Button
+        self._undobutton = QPushButton(self)
+        self._undobutton.setFixedSize(25, 25)
+        self._undobutton.setToolTip('Undo')
+        self._undobutton.setAccessibleName('toolbutton')
+        self._undobutton.setIcon(
+            QIcon(
+                Resources().resource(Resource.ResourceToolIcon,
+                                     which=ToolIcon.ToolIconUndo)
+            )
+        )
+        self._undobutton.setFlat(True)
+        self._undobutton.setEnabled(False)
+        self._undobutton.clicked.connect(self.slot_undo_clicked)
+
+        # The Redo Button
+        self._redobutton = QPushButton(self)
+        self._redobutton.setFixedSize(25, 25)
+        self._redobutton.setToolTip('Redo')
+        self._redobutton.setAccessibleName('toolbutton')
+        self._redobutton.setIcon(
+            QIcon(
+                Resources().resource(Resource.ResourceToolIcon,
+                                     which=ToolIcon.ToolIconRedo)
+            )
+        )
+        self._redobutton.setFlat(True)
+        self._redobutton.setEnabled(False)
+        self._redobutton.clicked.connect(self.slot_redo_clicked)
+
         # The Layout holding all toolbar contents
         self._layout = QHBoxLayout(self)
         self._layout.addWidget(self._fontbox)
         self._layout.addWidget(self._label_size)
         self._layout.addWidget(self._fontsize)
         self._layout.addWidget(self._appendtoggler)
+        self._layout.addWidget(self._undobutton)
+        self._layout.addWidget(self._redobutton)
 
         self.setLayout(self._layout)
+
+        # connect slots to the command manager for undo / redo
+        get_app_instance().cmd_mgr.sig_undo_stack_changed.connect(self.slot_undo_available)
+        get_app_instance().cmd_mgr.sig_redo_stack_changed.connect(self.slot_redo_available)
 
     # Override method
     def paintEvent(self, paint_event): # pylint: disable=invalid-name
@@ -71,9 +108,11 @@ class AugerToolbar(QWidget):
             (1, 1, -2, -2)
         ))
 
-        painter = QPainter(self)
-        painter.setPen(QPen(QColor(130, 135, 144, 255)))
-        painter.drawRect(*draw_rect)
+        # Prevent the painting of a border around children within the widget
+        if not self.childrenRect().contains(paint_event.rect()):
+            painter = QPainter(self)
+            painter.setPen(QPen(QColor(130, 135, 144, 255)))
+            painter.drawRect(*draw_rect)
 
         return super().paintEvent(paint_event)
 
@@ -97,3 +136,21 @@ class AugerToolbar(QWidget):
 
     def slot_append_toggle(self, state):
         self.sig_ao_toggle.emit(state)
+
+    def slot_undo_available(self, num_undos):
+        if num_undos > 0:
+            self._undobutton.setEnabled(True)
+        else:
+            self._undobutton.setEnabled(False)
+
+    def slot_redo_available(self, num_redos):
+        if num_redos > 0:
+            self._redobutton.setEnabled(True)
+        else:
+            self._redobutton.setEnabled(False)
+
+    def slot_undo_clicked(self): # pylint: disable=no-self-use
+        get_app_instance().cmd_mgr.undo_last_command()
+
+    def slot_redo_clicked(self): # pylint: disable=no-self-use
+        get_app_instance().cmd_mgr.redo_last_command()

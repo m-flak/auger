@@ -11,6 +11,7 @@ class Resource:
     ResourceIcon = 1
     ResourceUi = 2
     ResourceToolIcon = 3
+    ResourceStyleSheet = 4
 
 class ToolIcon:
     ToolIconFontSize = 1
@@ -19,6 +20,8 @@ class ToolIcon:
     ToolIconLanguages = 4
     ToolIconAppendOn = 5
     ToolIconAppendOff = 6
+    ToolIconUndo = 7
+    ToolIconRedo = 8
 
 class Ui:
     UiMainWindow = 1
@@ -41,7 +44,10 @@ class Resources:
                 ToolIcon.ToolIconLanguages: 'tool_languages.png',
                 ToolIcon.ToolIconAppendOn: 'tool_append_on.png',
                 ToolIcon.ToolIconAppendOff: 'tool_append_off.png',
+                ToolIcon.ToolIconUndo: 'tool_undo.png',
+                ToolIcon.ToolIconRedo: 'tool_redo.png',
             },
+            Resource.ResourceStyleSheet: 'stylesheet.qss',
         }
 
         self._cwd = os.path.abspath(os.path.dirname(__file__))

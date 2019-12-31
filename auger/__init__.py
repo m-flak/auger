@@ -1,11 +1,17 @@
 from .app import AugerApplication
 from .forms.mainwindow import MainWindow
+from .forms.resource import Resource, Resources
 
 __version__ = '0.0.1'
 
 def create_auger():
     app = AugerApplication([])
     window = MainWindow()
+
+    # Set Application stylesheet
+    sheet_file = Resources().resource(Resource.ResourceStyleSheet)
+    with open(sheet_file, 'r') as f:
+        app.setStyleSheet(f.read())
 
     # Make the main window the same size as before
     win_w = app.settings.value('window_width', type=int)

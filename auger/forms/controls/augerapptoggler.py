@@ -10,6 +10,8 @@ class AugerAppendToggler(QPushButton):
         self.setCheckable(True)
         self.setFlat(True)
 
+        self.setAccessibleName('toolbutton')
+
         self.icon_checked = QIcon(
             Resources().resource(Resource.ResourceToolIcon, which=ToolIcon.ToolIconAppendOn)
         )
