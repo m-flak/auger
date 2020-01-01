@@ -85,12 +85,14 @@ disable=print-statement,
         cyclic-import,
         too-many-instance-attributes,
         too-many-public-methods,
-        too-few-public-methods
+        too-few-public-methods,
+        no-name-in-module
 
 [BASIC]
 good-names=i,
            j,
            k,
+           v,
            ex,
            Run,
            _,

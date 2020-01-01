@@ -22,6 +22,7 @@ class AugerApplication(QApplication):
         self._ocr = None
         self._settings = None
         self._cmd_mgr = None
+        self._documents = dict(image=None, text=None)
 
     @property
     def main_window(self):
@@ -51,6 +52,28 @@ class AugerApplication(QApplication):
         if self._cmd_mgr is None:
             self._cmd_mgr = AugerCommandManager(self)
         return self._cmd_mgr
+
+    @property
+    def image_document(self):
+        return self._documents.get('image', None)
+
+    @image_document.setter
+    def image_document(self, value):
+        if self._documents.get('image', None) is None:
+            self._documents['image'] = value
+        else:
+            raise ValueError('image_document already set')
+
+    @property
+    def text_document(self):
+        return self._documents.get('text', None)
+
+    @text_document.setter
+    def text_document(self, value):
+        if self._documents.get('text', None) is None:
+            self._documents['text'] = value
+        else:
+            raise ValueError('text_document already set')
 
     def __del__(self):
         # deleting a QSettings in pyqt saves the settings

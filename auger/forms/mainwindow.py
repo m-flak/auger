@@ -1,12 +1,13 @@
 # pylint: disable=no-name-in-module
 from PyQt5 import uic
 from PyQt5.QtCore import Qt, QDir, QTimer, QVariant
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
-    QFileDialog, QGraphicsScene, QMainWindow, QMessageBox
+    QFileDialog, QMainWindow, QMessageBox
 )
 from ..app import get_app_instance
 from ..commands import TextOverwriteCommand, TextAppendCommand
+from ..document import ImageDocument
 from ..utils.html import QuickTag
 from .resource import Resource, Resources, Ui, ToolIcon
 from .settingsdialog import SettingsDialog
@@ -16,7 +17,6 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None, flags=Qt.WindowFlags(Qt.Window)):
         super().__init__(parent, flags)
 
-        self._area_to_process = tuple()
         self._settings_dialog = None
         self._about_dialog = None
         self._append_text = False
@@ -25,9 +25,6 @@ class MainWindow(QMainWindow):
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.slot_resize_timeout)
-
-        # pixmap for the loaded image
-        self.pixmap_of_image = QPixmap()
 
         # Widgets will be in this class named as in QtDesigner
         # use CamelCase in QtDesigner and snake_case here
@@ -61,9 +58,9 @@ class MainWindow(QMainWindow):
         # Help Menu signals to slots
         self.actionAbout_Auger.triggered.connect(self.slot_help_about)
 
-        # Scene for `imageSide_Image`
-        self.scene_for_image = QGraphicsScene(self.imageSide_Image)
-        self.imageSide_Image.setScene(self.scene_for_image)
+        # Setup for `imageSide_Image`
+        get_app_instance().image_document = ImageDocument(self.imageSide_Image)
+        self.imageSide_Image.setScene(get_app_instance().image_document.contents)
         # Assign Slots to `imageSide_Image`
         self.imageSide_Image.sig_select_start.connect(self.slot_select_start)
         self.imageSide_Image.sig_select_end.connect(self.slot_select_end)
@@ -114,14 +111,6 @@ class MainWindow(QMainWindow):
     @property
     def window_size(self):
         return (self.size().width(), self.size().height())
-
-    @property
-    def area_to_process(self):
-        return self._area_to_process
-
-    @area_to_process.setter
-    def area_to_process(self, value):
-        self._area_to_process = tuple(value)
 
     @property
     def append_text(self):
@@ -211,7 +200,7 @@ class MainWindow(QMainWindow):
                 return
 
             # remove anything leftover in the scene
-            self.imageSide_Image.scene().clear()
+            get_app_instance().image_document.reset_document()
 
             # reset state for scene & window
             self.imageSide_Image.resetTransform()
@@ -228,20 +217,18 @@ class MainWindow(QMainWindow):
         if not image_to_open:
             return
 
-        # Attempt the load the image into a pixmap
-        if not self.pixmap_of_image.load(image_to_open, None):
+        # Attempt to load the image
+        if not get_app_instance().image_document.load_document(lambda p: p.load(image_to_open, None)):
             QMessageBox.critical(self, 'Error Loading Image!',
                                  'Auger was unable to load the chosen image.',
                                  QMessageBox.Ok, QMessageBox.Ok)
             return
 
-        # Add the Pixmap of the chosen image to the Image View
-        # # Also fit it into the control.
-        self.scene_for_image.addPixmap(self.pixmap_of_image)
-        self.scene_for_image.setSceneRect(0, 0, self.pixmap_of_image.width(),
-                                          self.pixmap_of_image.height())
-        self.imageSide_Image.fitInView(self.scene_for_image.sceneRect(),
-                                       Qt.KeepAspectRatio)
+        # Fit the image into the view control
+        self.imageSide_Image.fitInView(
+            get_app_instance().image_document.contents.sceneRect(),
+            Qt.KeepAspectRatio
+        )
 
         self.statusbar.showMessage('Image Loaded. Select region with text...')
         self.setProperty('imageHasBeenLoaded', QVariant(True))
@@ -291,7 +278,7 @@ class MainWindow(QMainWindow):
                                    format(x2, y2),
                                    500
                                   )
-        self.area_to_process = (x1, y1, x2-x1, y2-y1)
+        get_app_instance().image_document.selection = (x1, y1, x2-x1, y2-y1)
 
     def slot_zoom_in_click(self):
         if self.property('imageHasBeenLoaded') is True:
@@ -306,7 +293,7 @@ class MainWindow(QMainWindow):
             self.statusbar.showMessage('Please load an image first.')
             return
 
-        if not self.area_to_process:
+        if not get_app_instance().image_document.has_selection:
             self.statusbar.showMessage('Select the region to process first...',
                                        500
                                       )
@@ -324,7 +311,7 @@ class MainWindow(QMainWindow):
 
         # Perform OCR :)
         get_app_instance().ocr.perform_ocr(
-            self.pixmap_of_image.toImage().copy(*self.area_to_process)
+            get_app_instance().image_document.get_selection_as_image()
         )
 
     def slot_tab_clicked(self, index):
