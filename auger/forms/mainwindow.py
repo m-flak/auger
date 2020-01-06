@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
 )
 from ..app import get_app_instance
 from ..commands import TextOverwriteCommand, TextAppendCommand
-from ..document import ImageDocument
+from ..document import ImageDocument, TextDocument
 from ..utils.html import QuickTag
 from .resource import Resource, Resources, Ui, ToolIcon
 from .settingsdialog import SettingsDialog
@@ -25,6 +25,9 @@ class MainWindow(QMainWindow):
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.slot_resize_timeout)
+
+        # Create the text document for textSide
+        get_app_instance().text_document = TextDocument()
 
         # Widgets will be in this class named as in QtDesigner
         # use CamelCase in QtDesigner and snake_case here
@@ -242,12 +245,9 @@ class MainWindow(QMainWindow):
             'Text Files (*.txt);;HTML Files (*.html *.htm)'
         )
 
-        if 'txt' in output_extension:
-            with open(output_file, 'w') as f:
-                f.write(self.textSide_textEdit.toPlainText())
-        elif 'htm' in output_extension:
-            with open(output_file, 'w') as f:
-                f.write(self.textSide_textEdit.toHtml())
+        output_format = 'html' if 'htm' in output_extension else 'text'
+        with open(output_file, 'w') as f:
+            get_app_instance().text_document.save_document(f, output_format)
 
     def slot_file_quit(self):
         self.close()

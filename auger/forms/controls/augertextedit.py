@@ -3,6 +3,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QTextEdit
 import lxml.html
+from ...app import get_app_instance
 
 class BodyStyle:
     def __init__(self, font_family, font_size):
@@ -77,6 +78,8 @@ class AugerTextEdit(QTextEdit):
 
         self.sig_style_changed.connect(self.slot_style_changed)
 
+        self.textChanged.connect(self.slot_text_changed)
+
     # Override method
     def setHtml(self, text): # pylint: disable=invalid-name
         new_html = InternalHTML(text)
@@ -119,6 +122,17 @@ class AugerTextEdit(QTextEdit):
     def slot_style_changed(self, styles):
         if self._our_html.html is None or self._our_html.document is None:
             return
-        
+
         self._our_html.apply_body_style(BodyStyle(*styles))
         self.setHtml(self._our_html.fresh_html)
+
+    def slot_text_changed(self):
+        try:
+            if 'text' in self.property('augerTextEditType'):
+                get_app_instance().text_document.contents.setHtml(self.toHtml())
+            elif 'html' in self.property('augerTextEditType'):
+                get_app_instance().text_document.contents.setHtml(self.toPlainText())
+            else:
+                return
+        except:
+            return

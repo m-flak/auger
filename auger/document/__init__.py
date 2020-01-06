@@ -1,1 +1,1 @@
-from .documents import ImageDocument
+from .documents import ImageDocument, TextDocument
