@@ -61,8 +61,6 @@ class AugerApplication(QApplication):
     def image_document(self, value):
         if self._documents.get('image', None) is None:
             self._documents['image'] = value
-        else:
-            raise ValueError('image_document already set')
 
     @property
     def text_document(self):
@@ -72,8 +70,6 @@ class AugerApplication(QApplication):
     def text_document(self, value):
         if self._documents.get('text', None) is None:
             self._documents['text'] = value
-        else:
-            raise ValueError('text_document already set')
 
     def __del__(self):
         # deleting a QSettings in pyqt saves the settings
