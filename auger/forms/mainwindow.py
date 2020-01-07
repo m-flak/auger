@@ -29,10 +29,21 @@ class MainWindow(QMainWindow):
         # Create the text document for textSide
         get_app_instance().text_document = TextDocument()
 
+        # get the welcome message
+        with open(Resources().resource(Resource.ResourceWelcomeHTML), 'r') as f:
+            welcome_msg = f.read()
+
+        # load the welcome message into the document
+        get_app_instance().text_document.contents.setHtml(welcome_msg)
+
         # Widgets will be in this class named as in QtDesigner
         # use CamelCase in QtDesigner and snake_case here
         uic.loadUi(Resources().resource(Resource.ResourceUi, which=Ui.UiMainWindow),
                    self)
+
+        # now that ui components are loaded, set the edits to the contents of document
+        self.textSide_textEdit.setHtml(get_app_instance().text_document.contents.toHtml())
+        self.textSide_htmlEdit.setPlainText(get_app_instance().text_document.contents.toHtml())
 
         # Set Icon
         self.setWindowIcon(QIcon(Resources().resource(Resource.ResourceIcon)))
@@ -322,6 +333,8 @@ class MainWindow(QMainWindow):
                     self.textSide_htmlEdit.transfer_text_to_other_html(
                         self.textSide_textEdit
                     )
+                    self.textSide_htmlEdit.setProperty('augerActiveTextEdit', False)
+                    self.textSide_textEdit.setProperty('augerActiveTextEdit', True)
                 except TypeError:
                     return
             # clicking 'HTML' from 'Text'
@@ -330,12 +343,14 @@ class MainWindow(QMainWindow):
                     self.textSide_textEdit.transfer_html_to_other_text(
                         self.textSide_htmlEdit
                     )
+                    self.textSide_htmlEdit.setProperty('augerActiveTextEdit', True)
+                    self.textSide_textEdit.setProperty('augerActiveTextEdit', False)
                 except TypeError:
                     return
 
     def slot_textedit_changed(self):
-        self.actionSave_Output.setEnabled(True)
         self.textSide_textEdit.setReadOnly(False)
+        self.actionSave_Output.setEnabled(True)
         self.textSide_toolBar.setEnabled(True)
 
     def slot_ocr_performed(self, ocr_text):

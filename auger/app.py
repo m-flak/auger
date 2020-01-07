@@ -24,6 +24,8 @@ class AugerApplication(QApplication):
         self._cmd_mgr = None
         self._documents = dict(image=None, text=None)
 
+        self.setApplicationName('auger')
+
     @property
     def main_window(self):
         return self._main_window
@@ -44,7 +46,7 @@ class AugerApplication(QApplication):
     @property
     def settings(self):
         if self._settings is None:
-            self._settings = QSettings('m-flak', 'auger', self)
+            self._settings = QSettings('m-flak', self.applicationName(), self)
         return self._settings
 
     @property

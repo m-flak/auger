@@ -12,6 +12,7 @@ class Resource:
     ResourceUi = 2
     ResourceToolIcon = 3
     ResourceStyleSheet = 4
+    ResourceWelcomeHTML = 5
 
 class ToolIcon:
     ToolIconFontSize = 1
@@ -48,6 +49,7 @@ class Resources:
                 ToolIcon.ToolIconRedo: 'tool_redo.png',
             },
             Resource.ResourceStyleSheet: 'stylesheet.qss',
+            Resource.ResourceWelcomeHTML: 'welcome.html',
         }
 
         self._cwd = os.path.abspath(os.path.dirname(__file__))

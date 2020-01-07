@@ -5,7 +5,9 @@ from auger.forms.mainwindow import MainWindow
 @pytest.fixture(scope='session')
 def qapp(qapp):
     any_args = qapp.arguments()
-    return AugerApplication(any_args)
+    aug_app = AugerApplication(any_args)
+    aug_app.setApplicationName('auger_test')
+    return aug_app
 
 @pytest.fixture
 def auger_window(qtbot, qapp):

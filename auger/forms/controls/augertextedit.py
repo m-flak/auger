@@ -128,11 +128,12 @@ class AugerTextEdit(QTextEdit):
 
     def slot_text_changed(self):
         try:
-            if 'text' in self.property('augerTextEditType'):
-                get_app_instance().text_document.contents.setHtml(self.toHtml())
-            elif 'html' in self.property('augerTextEditType'):
-                get_app_instance().text_document.contents.setHtml(self.toPlainText())
-            else:
-                return
+            if self.property('augerActiveTextEdit'):
+                if 'text' in self.property('augerTextEditType'):
+                    get_app_instance().text_document.contents.setHtml(self.toHtml())
+                elif 'html' in self.property('augerTextEditType'):
+                    get_app_instance().text_document.contents.setHtml(self.toPlainText())
+                else:
+                    return
         except:
             return
