@@ -32,7 +32,13 @@ Auger supports output into the following formats:
 
 Installing **_Auger_** is easy...
 
-#### From Source Directory:
+#### From a Release:
+Auger is available in binary distributions for both Windows and Linux. [You can get them here.](https://github.com/m-flak/auger/releases)
+
+#### From the Git Repository:
+You can always just clone the repo and setup a virtual environment for the purpose of running Auger:
+
+###### From Source Directory:
 ```bash
 git clone https://github.com/m-flak/auger auger
 cd auger
@@ -40,7 +46,7 @@ pip install -r requirements.txt
 python auger.py
 ```
 
-#### Using _setuptools_:
+###### Using _setuptools_:
 ```bash
 git clone https://github.com/m-flak/auger auger
 cd auger
