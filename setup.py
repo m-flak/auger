@@ -8,6 +8,12 @@ BUILD_DIRS = [
     'build',
     'dist',
 ]
+INSTALL_DATA_FILES = [
+    ('share/icons/hicolor/64x64/apps',
+     ['data/org.m-flak.Auger.png']),
+    ('share/applications',
+     ['data/org.m-flak.Auger.desktop']),
+]
 
 def get_requirements():
     requirements = None
@@ -51,5 +57,6 @@ setup(
         'gui_scripts': [
             'auger = auger.__main__:main',
         ],
-    }
+    },
+    data_files=INSTALL_DATA_FILES
 )

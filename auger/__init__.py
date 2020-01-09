@@ -2,7 +2,7 @@ from .app import AugerApplication
 from .forms.mainwindow import MainWindow
 from .forms.resource import Resource, Resources
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 def create_auger():
     app = AugerApplication([])

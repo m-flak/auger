@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Auger
+GenericName=OCR Utility
+Comment=Auger is a GUI OCR tool for extracting text from images.
+Keywords=ocr;text;recognition;
+Categories=Office;Graphics;OCR
+Type=Application
+Icon=org.m-flak.Auger
+Exec=auger
+Terminal=false
+StartupWMClass=Auger
+StartupNotify=true
